@@ -1,3 +1,8 @@
 python show_trajectory_bounce.py "/home/fritz/ByteTrack/YOLOX_outputs/yolox_x_mix_det/track_vis/2022_11_22_18_19_23/Pro Senior Mixed Doubles Gold Medal Match - 2021 Tournament of Champions-FQwsnP1VLUU.f299.mp4" "/home/fritz/Videos/Pro Senior Mixed Doubles Gold Medal Match - 2021 Tournament of Champions-FQwsnP1VLUU.f299_predict.csv" courtConfLong.csv 15000
 
 
+## to subset a video with times...
+
+ffmpeg -ss 00:13:35 -i tuesNightPBAug2.mp4 -t 00:33:48 -acodec copy tuesOneGame.mp4
+
+
