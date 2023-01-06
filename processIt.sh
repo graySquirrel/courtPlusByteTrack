@@ -33,9 +33,15 @@ thisdir=`pwd`
 mkdir -p $filename
 cp $inVid $filename/.
 #######################################################
+# None of the court detect stuff is robust enough. doing manually ##########
+#######################################################
+#### extract frame for court finding
+#cd $filename
+#python ../extractFrame.py -v $vidname -f 1
+#cd ..
 #### detect court
 # in: video
-docker run --rm -v ~/courtPlusByteTrack/$filename:/pickleball-court-detection/build/data detect:latest ./data/$vidname ./data 36
+#docker run --rm -v ~/courtPlusByteTrack/$filename:/pickleball-court-detection/build/data detect:latest ./data/extractedFrame.jpg ./data
 # out: court.txt, testframe.png, testframeWithLines.png
 #######################################################
 cd $filename
@@ -45,6 +51,11 @@ cd $filename
 deactivate
 my_bytetrack 
 echo "current env is" $CONDA_DEFAULT_ENV
+#######################################################
+# Instead, we'll do manually ##########################
+######### do manual court finding in bytetrack env ####
+python ../extractFrame.py -v $vidname -f 1
+python ../courtfind.py 
 #######################################################
 #### create mask and per frame confidences that court is in frame.
 # in: video. Also expects to find testframe.png and court.txt in cwd
