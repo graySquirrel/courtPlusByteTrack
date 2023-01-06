@@ -23,7 +23,7 @@ if args["frame_num"]:
 else:
 	print("missing arg -f for frame number, using 0")
 	frame_num = 0
-outframe = "extractedFrame.jpg"
+outframe = "testframe.png"
 
 # Create a VideoCapture object and read from input file
 # If the input is the camera, pass 0 instead of the video file name
