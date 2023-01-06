@@ -9,7 +9,7 @@ img = imgOrig.copy()
 
 
 dimensions = img.shape
-print(dimensions)
+#print(dimensions)
 
 windowname = "courtfind"
 thepoints = []
@@ -25,40 +25,25 @@ def draw_circle(event, x, y, flags, param):
 def draw_poly(event, x, y, flags, param):
     if event == cv2.EVENT_LBUTTONDOWN:
         #img = imgOrig.copy()
-        print("adding point")
+        #print("adding point")
         thepoints.append([x, y])
-        print(thepoints)
+        #print(thepoints)
         for p in thepoints:
             cv2.circle(img, p, 10, (0, 255, 0), -1)
         pts = np.array(thepoints, np.int32)
         pts = pts.reshape((-1, 1, 2))
-        print(pts)
+        #print(pts)
         if len(thepoints) < 4:
             isClosed = False
         else:
             isClosed = True
-        print("isclosed", isClosed)
+        #print("isclosed", isClosed)
         cv2.polylines(img, [pts], isClosed, (0, 255, 0), 5)
 
 
 def sortNsave():
-    # sort the list so it goes 0,0 0,long wide,long wide,0
-    # write out the court.txt file
-    rows = [[thepoints[0][0], thepoints[0][1]],
-            [thepoints[1][0], thepoints[1][1]],
-            [thepoints[2][0], thepoints[2][1]],
-            [thepoints[3][0], thepoints[3][1]],
-            [0, 0],
-            [0, 0],
-            [0, 0],
-            [0, 0],
-            [0, 0],
-            [0, 0],
-            [0, 0],
-            [0, 0],
-            [0, 0],
-            [0, 0],
-            [0, 0],
+    # make projection
+	orthopoints = [[0, 0],
             [0, 13.41],
             [6.1, 13.41],
             [6.1, 0],
@@ -72,10 +57,25 @@ def sortNsave():
             [3.05, 8.84],
             [0, 6.71],
             [6.1, 6.71]]
-    filename = "court.txt"
-    with open(filename, 'w') as csvfile:
-        csvwriter = csv.writer(csvfile)
-        csvwriter.writerows(rows)
+	#print(thepoints[:4])
+	#print(orthopoints[:4])
+	xform = cv2.getPerspectiveTransform(np.float32(orthopoints[:4]), np.float32(thepoints[:4]))
+	src = np.zeros((len(orthopoints), 1, 2))
+	src[:, 0] = orthopoints
+	#print("src",src)
+	outpt = cv2.perspectiveTransform(src, xform)
+	# write out the court.txt file
+	#print(outpt)
+	outpt = np.round(outpt, 0).astype(int)
+	outpt = outpt[:,0,:]
+	outpt = outpt.tolist()
+	#print(outpt)
+	#print(orthopoints)
+	rows = outpt + orthopoints
+	filename = "court.txt"
+	with open(filename, 'w') as csvfile:
+		csvwriter = csv.writer(csvfile)
+		csvwriter.writerows(rows)
 
 
 cv2.namedWindow(winname=windowname)
