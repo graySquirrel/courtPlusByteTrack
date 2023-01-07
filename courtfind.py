@@ -27,6 +27,14 @@ def draw_poly(event, x, y, flags, param):
         #img = imgOrig.copy()
         #print("adding point")
         thepoints.append([x, y])
+        if len(thepoints) == 1:
+            print("click BOTTOM LEFT")
+        elif len(thepoints) == 2:
+            print("click BOTTOM RIGHT")
+        elif len(thepoints) == 3:
+            print("click TOP RIGHT")
+        elif len(thepoints) == 4:
+            print("click 's' to save and show the court lines, then 'q' to quit")
         #print(thepoints)
         for p in thepoints:
             cv2.circle(img, p, 10, (0, 255, 0), -1)
@@ -95,7 +103,7 @@ cv2.namedWindow(winname=windowname)
 #cv2.setMouseCallback(windowname, draw_circle)
 cv2.setMouseCallback(windowname, draw_poly)
 
-
+print("click TOP LEFT")
 while True:
     cv2.imshow(windowname, img)
 
