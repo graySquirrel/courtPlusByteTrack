@@ -410,7 +410,8 @@ def imageflow_demo(predictor, vis_folder, current_time, args):
             #cv2.waitKey(0)
             thisPeep = np.array([[0,0],[0,0],[0,0],[0,0]])
             # try skipping if low confidence court detection
-            if outputs[0] is not None and conf > 0.85:
+			# dont do that for videos that do subtle zooms
+            if outputs[0] is not None:# and conf > 0.85:
                 online_targets = tracker.update(outputs[0], [img_info['height'], img_info['width']], exp.test_size)
                 online_tlwhs = []
                 online_ids = []
