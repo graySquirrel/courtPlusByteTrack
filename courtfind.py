@@ -40,6 +40,17 @@ def draw_poly(event, x, y, flags, param):
         #print("isclosed", isClosed)
         cv2.polylines(img, [pts], isClosed, (0, 255, 0), 5)
 
+def drawCourtLines(img, points):
+	img = cv2.line(img, points[0], points[1], [0, 0, 255], 3)
+	img = cv2.line(img, points[1], points[2], [0, 0, 255], 3)
+	img = cv2.line(img, points[2], points[3], [0, 0, 255], 3)
+	img = cv2.line(img, points[3], points[0], [0, 0, 255], 3)
+	img = cv2.line(img, points[4], points[7], [0, 0, 255], 3)
+	img = cv2.line(img, points[5], points[6], [0, 0, 255], 3)
+	img = cv2.line(img, points[8], points[10], [0, 0, 255], 3)
+	img = cv2.line(img, points[9], points[11], [0, 0, 255], 3)
+	img = cv2.line(img, points[12], points[13], [0, 0, 255], 3)
+
 
 def sortNsave():
     # make projection
@@ -72,6 +83,8 @@ def sortNsave():
 	#print(outpt)
 	#print(orthopoints)
 	rows = outpt + orthopoints
+	drawCourtLines(img, outpt)
+
 	filename = "court.txt"
 	with open(filename, 'w') as csvfile:
 		csvwriter = csv.writer(csvfile)
@@ -98,6 +111,6 @@ while True:
             print("the number of points needs to be 4, it is ", len(thepoints))
         else:
             sortNsave()
-            break
+            #break # wait for user
 
 cv2.destroyAllWindows()
