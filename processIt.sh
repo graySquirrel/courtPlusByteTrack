@@ -55,7 +55,9 @@ echo "current env is" $CONDA_DEFAULT_ENV
 # Instead, we'll do manually ##########################
 ######### do manual court finding in bytetrack env ####
 python ../extractFrame.py -v $vidname -f 1
+# out testframe.png
 python ../courtfind.py 
+# out court.txt
 #######################################################
 #### create mask and per frame confidences that court is in frame.
 # in: video. Also expects to find testframe.png and court.txt in cwd
@@ -66,7 +68,7 @@ python ../validate.py $vidname
 # in: video, courtConf.csv, mask.png, court.txt
 echo "current env is" $CONDA_DEFAULT_ENV
 python ../demo_track_pbcourt.py video -f ~/ByteTrack/exps/example/mot/yolox_s_mix_det.py -c ~/ByteTrack/models/bytetrack_s_mot17.pth.tar --path $vidname --fp16 --fuse --save_result -cc courtConf.csv  -mask mask.png -map court.txt
-# out: byteTrackPbcourt.mp4, detectionsIds_peeps.txt
+# out: byteTrackPbcourt.mp4, detectionsIds_peeps.txt rawDetectionsIds.txt
 #######################################################
 pushd /home/fritz/test_tracknet2/TrackNetv2/3_in_3_out
 #source ~/tracknet2/bin/activate
