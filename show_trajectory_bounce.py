@@ -134,7 +134,7 @@ FSLD = 0 # frames since long drive
 inPlay = 0
 
 # initialize output csv
-outfields = ['frame','InPlay','InServicePos']
+outfields = ['frame','LongTermDetectRate', 'InPlay','InServicePos']
 outrows = []
 output_csv_path = input_video_path.split('.')[0] + "_metadata.csv"
 
@@ -209,16 +209,18 @@ while(True):
 			longTermDetectRate += 1
 	longTermDetectRate = longTermDetectRate / (currentFrame - firstFrame)
 
-	inPlay = 1 if (longTermDetectRate > 0.5 or FSLD < 100) and conf[currentFrame] > 0.85 else 0
+
 	opencvImage =  cv2.cvtColor(np.array(PIL_image), cv2.COLOR_RGB2BGR)
 
 	thisYs = peepYlocs[currentFrame]
 	thisXs = peepXlocs[currentFrame]
 	numAtSL =      len([i for i in thisYs if (i<1.0 or i>12.41) and i != 0.00]) # court dims 0<Y<13.41m
 	numInXbounds = len([i for i in thisXs if i>-1.0 and i<7.1   and i != 0.00]) # court dims 0<X<6.1m
-	servicePos = 1 if (numAtSL == 3 and numInXbounds == 4) and conf[currentFrame] > 0.85 else 0
+	numNotAtSL =   len([i for i in thisYs if (i>1.0 and i<12.41) and i != 0.00]) # 
+	servicePos = 1 if (numAtSL == 3 and numInXbounds == 4 and numNotAtSL == 1) and conf[currentFrame] > 0.85 else 0
+	inPlay = 1 if (longTermDetectRate > 0.5 or FSLD < 100 or (numNotAtSL > 1 and numInXbounds == 4)) and conf[currentFrame] > 0.85 else 0
 
-	outrows += [[currentFrame, inPlay, servicePos]]
+	outrows += [[currentFrame, longTermDetectRate, inPlay, servicePos]]
 
 	meanV = "meanVm: %.2f" % meanVmag
 	stdV = "stdVm: %.2f" % stdV
