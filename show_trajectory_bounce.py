@@ -134,7 +134,7 @@ FSLD = 0 # frames since long drive
 inPlay = 0
 
 # initialize output csv
-outfields = ['frame','LongTermDetectRate', 'InPlay','InServicePos']
+outfields = ['frame','LongTermDetectRate', 'InPlay','InServicePos','nearFarServ','leftRightServ']
 outrows = []
 output_csv_path = input_video_path.split('.')[0] + "_metadata.csv"
 
@@ -215,12 +215,36 @@ while(True):
 	thisYs = peepYlocs[currentFrame]
 	thisXs = peepXlocs[currentFrame]
 	numAtSL =      len([i for i in thisYs if (i<1.0 or i>12.41) and i != 0.00]) # court dims 0<Y<13.41m
+	numNear =      len([i for i in thisYs if (i>12.41)])
+	numNearSide =  len([i for i in thisYs if (i<6.705)]) # the net line is 6.705, 13.41/2
+	numFarSide =   len([i for i in thisYs if (i>6.705)]) # remember 0,0 is back left.
+	numFar  =      len([i for i in thisYs if (i<1.0)])
 	numInXbounds = len([i for i in thisXs if i>-1.0 and i<7.1   and i != 0.00]) # court dims 0<X<6.1m
 	numNotAtSL =   len([i for i in thisYs if (i>1.0 and i<12.41) and i != 0.00]) # 
-	servicePos = 1 if (numAtSL == 3 and numInXbounds == 4 and numNotAtSL == 1) and conf[currentFrame] > 0.85 else 0
+	servicePos = 1 if (numAtSL == 3 and numInXbounds == 4 and numNotAtSL == 1 and (numNearSide==2 and numFarSide==2)) and conf[currentFrame] > 0.85 else 0
 	inPlay = 1 if (longTermDetectRate > 0.5 or FSLD < 100 or (numNotAtSL > 1 and numInXbounds == 4)) and conf[currentFrame] > 0.85 else 0
+	nearFar = 0 # 0 is none
+	leftRightServer = 0 # the Server is on left (1) or right (2) side as they look at the court
+	if (servicePos and numFar == 2 and numNear == 1):
+		nearFar = 1 # 1 is far
+		for a in range(0,4): # there is only one numNear...
+			if thisYs[a] > 12.41:
+				if thisXs[a] < 3.05: # The Near person is on Left, so far server is on their left
+					leftRightServer = 1
+				else:
+					leftRightServer = 2
+				break
+	if (servicePos and numFar == 1 and numNear == 2):
+		nearFar = 2 # 2 is near
+		for a in range(0,4): # there is only one numFar...
+			if thisYs[a] < 1.0:
+				if thisXs[a] < 3.05: # The Far person is on their Right, so near server is on their right
+					leftRightServer = 2
+				else:
+					leftRightServer = 1
+				break
 
-	outrows += [[currentFrame, longTermDetectRate, inPlay, servicePos]]
+	outrows += [[currentFrame, longTermDetectRate, inPlay, servicePos, nearFar, leftRightServer]]
 
 	meanV = "meanVm: %.2f" % meanVmag
 	stdV = "stdVm: %.2f" % stdV

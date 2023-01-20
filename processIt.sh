@@ -67,8 +67,9 @@ python ../validate.py $vidname
 #### object detection and tracking for players, annotate video.
 # in: video, courtConf.csv, mask.png, court.txt
 echo "current env is" $CONDA_DEFAULT_ENV
-python ../demo_track_pbcourt.py video -f ~/ByteTrack/exps/example/mot/yolox_s_mix_det.py -c ~/ByteTrack/models/bytetrack_s_mot17.pth.tar --path $vidname --fp16 --fuse --save_result -cc courtConf.csv  -mask mask.png -map court.txt
+python ../demo_track_pbcourt.py video -f ~/ByteTrack/exps/example/mot/yolox_x_mix_det.py -c ~/ByteTrack/models/bytetrack_x_mot17.pth.tar --path $vidname --fp16 --fuse --save_result -cc courtConf.csv  -mask mask.png -map court.txt
 # out: byteTrackPbcourt.mp4, detectionsIds_peeps.txt rawDetectionsIds.txt
+conda deactivate
 #######################################################
 pushd /home/fritz/test_tracknet2/TrackNetv2/3_in_3_out
 #source ~/tracknet2/bin/activate
@@ -87,6 +88,8 @@ popd
 # python ../show_trajectory_bounce.py
 python ../show_trajectory_bounce.py byteTrackPbcourt.mp4 ${filename}_predict.csv courtConf.csv detectionsIds_peeps.txt 1
 
+python ../postproc.py
+deactivate
 # out: byteTrackPbcourt_trajectory.mp4 with stats in video
 # out: TODO ballInPlay, inServicePosition
 duration=$SECONDS
