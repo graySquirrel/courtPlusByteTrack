@@ -355,7 +355,7 @@ def drawPeepPoints(img,tlwhs, mat, points):
     return img, outpt # return the not-scaled peep points.
 ########################################################################
 def imageflow_demo(predictor, vis_folder, current_time, args):
-    datfile = args.court_mapping
+    datfile = args.court_mappingf
     imgpoints, intimgpoints, orthpoints = getpoints(datfile)
     xform = cv2.getPerspectiveTransform(imgpoints[:4], orthpoints[:4])
     # read court confidence file
@@ -385,7 +385,11 @@ def imageflow_demo(predictor, vis_folder, current_time, args):
     vid_writer = cv2.VideoWriter(
         save_path, cv2.VideoWriter_fourcc(*"mp4v"), fps, (int(width), int(height))
     )
-    tracker = BYTETracker(args, frame_rate=30)
+    print("fps ",fps)
+    fpsint = round(fps,0)
+    print("fpsint ",fpsint)
+    #tracker = BYTETracker(args, frame_rate=30)
+    tracker = BYTETracker(args, frame_rate=fpsint)
     timer = Timer()
     frame_id = 0
     results = []
