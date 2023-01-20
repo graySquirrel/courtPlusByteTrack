@@ -96,7 +96,7 @@ print("endcount",endFrameCount)
 #get video fps&video size
 currentFrame= startFrame
 video = cv2.VideoCapture(input_video_path)
-fps = int(video.get(cv2.CAP_PROP_FPS))
+fps = video.get(cv2.CAP_PROP_FPS)
 output_width = int(video.get(cv2.CAP_PROP_FRAME_WIDTH))
 output_height = int(video.get(cv2.CAP_PROP_FRAME_HEIGHT))
 #fourcc = cv2.VideoWriter_fourcc(*'XVID')
@@ -144,7 +144,8 @@ while(True):
 	#capture frame-by-frame
 	if currentFrame % 500 == 0:
 		print(currentFrame) 
-	video.set(1,currentFrame+1); 
+	#video.set(1,currentFrame+1);
+	video.set(1,currentFrame); 
 	ret, img = video.read()
 		#if there dont have any frame in video, break
 	if not ret: 
@@ -207,7 +208,10 @@ while(True):
 	for i in range(firstFrame,currentFrame):
 		if visibility[i] == 1 and conf[i] > 0.85:
 			longTermDetectRate += 1
-	longTermDetectRate = longTermDetectRate / (currentFrame - firstFrame)
+	if (currentFrame - firstFrame) > 0:
+		longTermDetectRate = longTermDetectRate / (currentFrame - firstFrame)
+	else:
+		longTermDetectRate = 0
 
 
 	opencvImage =  cv2.cvtColor(np.array(PIL_image), cv2.COLOR_RGB2BGR)
