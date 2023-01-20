@@ -42,7 +42,7 @@ class PickleballScore:
 			self.serverSide = newServerSide
 			self.start = False
 			if self.debug:
-				print(self.serverSide, self.score1, self.score2)
+				print(self.serverSide, self.score1, self.score2, self.error)
 			return
 
 		if   self.serverSide == ServerSide.NR: #can only go to NL or FR
@@ -100,7 +100,7 @@ class PickleballScore:
 		# update self.serverSide
 		self.serverSide = newServerSide
 		if self.debug:
-			print(self.serverSide, self.score1, self.score2)
+			print(self.serverSide, self.score1, self.score2, self.error)
 
 
 
