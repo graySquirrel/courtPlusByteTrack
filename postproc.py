@@ -24,8 +24,6 @@ print("starttimesec is",starttimesec)
 video = cv2.VideoCapture(vid);
 fps = video.get(cv2.CAP_PROP_FPS)
 print("fps",fps)
-fps = int(fps)
-print("fpsint",fps)
 video.release()
 
 def convert(seconds, l = False):
@@ -104,7 +102,8 @@ for i in range(starttimesec,len(InServSec)):
 			scoreText = scoreText2
 		else:
 			scoreText = scoreText1 + " or " + scoreText2
-
+		if pbs.error:
+			scoreText = ""
 		print(convert(i,True) + " " + NFtext + LRtext + scoreText)
 		#transcript += [["%s Serve" % (convert(i,True))]]
 		transcript += [[convert(i,True)]]
@@ -117,7 +116,7 @@ for i in range(starttimesec,len(InServSec)):
 print(transcript)
 with open('serveTranscript.csv', 'w') as csvfile: 
 	# creating a csv writer object 
-	csvwriter = csv.writer(csvfile) 
+	csvwriter = csv.writer(csvfile, delimiter=";")
         
 	# writing the fields 
 	csvwriter.writerows(transcript) 
