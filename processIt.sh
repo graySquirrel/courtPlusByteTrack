@@ -86,7 +86,7 @@ popd
 #### show ball trajectory, calculate point metadata
 # in: byteTrackPbcourt.mp4, predict.csv, courtConf.csv, detectionsIds_peeps.txt
 # python ../show_trajectory_bounce.py
-python ../show_trajectory_bounce.py byteTrackPbcourt.mp4 ${filename}_predict.csv courtConf.csv detectionsIds_peeps.txt 1
+python ../show_trajectory_bounce.py byteTrackPbcourt.mp4 ${filename}_predict.csv courtConf.csv detectionsIds_peeps.txt 0 #startframe
 
 python ../postproc.py
 deactivate
