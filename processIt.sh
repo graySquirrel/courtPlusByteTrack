@@ -91,7 +91,7 @@ python ../show_trajectory_bounce.py byteTrackPbcourt.mp4 ${filename}_predict.csv
 python ../postproc.py
 deactivate
 # out: byteTrackPbcourt_trajectory.mp4 with stats in video
-# out: TODO ballInPlay, inServicePosition
+
 duration=$SECONDS
 echo "$(($duration / 60)) minutes and $(($duration % 60)) seconds elapsed."
 
