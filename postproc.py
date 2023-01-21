@@ -59,7 +59,9 @@ InBoth = [float(bool(InPlay[i]) and bool(InServicePos[i])) for i in range(len(In
 ## Downsample to per-second, assuming 30fps
 #W = 30
 #W = 60
-W=fps
+print(fps)
+W=int(round(fps,0))
+print(W)
 thelen = len(InPlay)
 InPlaySec = [np.mean(InPlay[i:i+W]) for i in range(0, thelen, W)]
 InServSec = [np.mean(InServicePos[i:i+W]) for i in range(0, thelen, W)]
