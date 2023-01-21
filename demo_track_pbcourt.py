@@ -355,7 +355,7 @@ def drawPeepPoints(img,tlwhs, mat, points):
     return img, outpt # return the not-scaled peep points.
 ########################################################################
 def imageflow_demo(predictor, vis_folder, current_time, args):
-    datfile = args.court_mappingf
+    datfile = args.court_mapping
     imgpoints, intimgpoints, orthpoints = getpoints(datfile)
     xform = cv2.getPerspectiveTransform(imgpoints[:4], orthpoints[:4])
     # read court confidence file
