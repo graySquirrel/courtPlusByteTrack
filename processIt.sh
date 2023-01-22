@@ -16,6 +16,17 @@
 SECONDS=0 
 
 inVid=$1
+ignoreCourt=0
+ARGC=$#
+#echo $ARGC
+if [ $ARGC -eq 2 ];
+then
+	if [ $2 -eq 1 ];
+	then
+	ignoreCourt=1
+	fi
+fi
+#echo $ignoreCourt
 # if $1 stays defined then conda craps out because it must be looking for that to do something.
 set -- ""
 vidname="${inVid##*/}"
@@ -54,9 +65,14 @@ echo "current env is" $CONDA_DEFAULT_ENV
 #######################################################
 # Instead, we'll do manually ##########################
 ######### do manual court finding in bytetrack env ####
-python ../extractFrame.py -v $vidname -f 1
-# out testframe.png
-python ../courtfind.py 
+if [ $ignoreCourt -ne 1 ];
+then
+	python ../extractFrame.py -v $vidname -f 1
+	# out testframe.png
+	python ../courtfind.py 
+else
+	echo "using existing court info"
+fi
 # out court.txt
 #######################################################
 #### create mask and per frame confidences that court is in frame.
