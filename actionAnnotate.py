@@ -87,7 +87,7 @@ def click_capture(event, x, y, flags, param):
 				print("ID", IDselected, "selected on Frame", framenum)
 				print("Now select 1:Serve, 2:Return, 3:Drop, 4:Drive, 5:Dink, 6:Volley, 7:Lob")
 				return
-		print("No rects found")
+		print("You clicked, but No bounding boxes found")
 
 #############
 
