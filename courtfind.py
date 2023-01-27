@@ -1,6 +1,24 @@
 import cv2
 import numpy as np
 import csv
+import argparse
+import sys
+from lensfunCorrect import getUndistortedCoordinates
+
+# Construct the argument parser and parse the arguments
+arg_desc = '''\
+           use -d to dewarp the test image 
+        '''
+parser = argparse.ArgumentParser(formatter_class = argparse.RawDescriptionHelpFormatter,
+                                    description= arg_desc)
+ 
+parser.add_argument("-d", "--dewarp", action='store_true')
+args = vars(parser.parse_args())
+#print(args)
+dewarp = False
+if args["dewarp"]:
+    dewarp =  True
+    print("dewarp",dewarp)
 
 # Do the points top left, bottom left, bottom right, top right.
 
@@ -102,6 +120,11 @@ def sortNsave():
 cv2.namedWindow(winname=windowname)
 #cv2.setMouseCallback(windowname, draw_circle)
 cv2.setMouseCallback(windowname, draw_poly)
+height, width = img.shape[0], img.shape[1]
+if dewarp:
+    un = getUndistortedCoordinates(width, height)
+    imgOrig = cv2.remap(imgOrig, un, None, cv2.INTER_LANCZOS4)
+img = imgOrig.copy()
 
 print("click TOP LEFT")
 while True:
