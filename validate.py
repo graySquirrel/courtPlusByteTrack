@@ -117,17 +117,18 @@ def getpoints(file):
 def getoutbounds(orthpts, imgpts):
     resmatrix = cv2.getPerspectiveTransform(orthpts[:4], imgpts[:4])
     testpts = []
+    limit = 2.0
     for pt in orthpts[:4]:
         x = pt[0]
         y = pt[1]
         if x == 0:
-            x = -2.5
+            x = -limit
         else:
-            x += 2.5
+            x += limit
         if y == 0:
-            y = -2.5
+            y = -limit
         else:
-            y += 2.5
+            y += limit
         testpts.append([x, y])
     # have to reshape the input to perspectiveTransform cray cray
     src = np.zeros((len(testpts), 1, 2))
