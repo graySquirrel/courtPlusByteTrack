@@ -7,6 +7,9 @@
 # if docker pukes, do a newgrp docker in the terminal.
 
 # $1 is the first arg, the full path name of a video to process.
+# $2 is second arg, a boolean (0, 1) if 1 will skip asking user to input court corners
+# $3 is third arg, a boolean (0, 1) if 1 will dewarp the wide angleness of the video. (you have to know)
+
 # e.g. ./processIt.sh ~/Videos/senProf22.mp4
 
 # get path
@@ -17,14 +20,22 @@ SECONDS=0
 
 inVid=$1
 ignoreCourt=0
+dewarpVideo=0
 ARGC=$#
 #echo $ARGC
-if [ $ARGC -eq 2 ];
+if [ $ARGC -eq 3 ];
 then
 	if [ $2 -eq 1 ];
 	then
 	ignoreCourt=1
 	fi
+	if [ $3 -eq 1 ];
+	then
+	dewarpVideo=1
+	fi
+else
+	echo "Usage: ./processIt.sh <video name> <skip court inputs 0,1> <dewarp wide angle 0,1>"
+	exit
 fi
 #echo $ignoreCourt
 # if $1 stays defined then conda craps out because it must be looking for that to do something.
@@ -62,6 +73,7 @@ cd $filename
 deactivate
 my_bytetrack 
 echo "current env is" $CONDA_DEFAULT_ENV
+
 #######################################################
 # Instead, we'll do manually ##########################
 ######### do manual court finding in bytetrack env ####
@@ -69,11 +81,26 @@ if [ $ignoreCourt -ne 1 ];
 then
 	python ../extractFrame.py -v $vidname -f 1
 	# out testframe.png
-	python ../courtfind.py 
+	if [ $dewarpVideo -eq 1 ];
+	then
+		python ../courtfind.py -d
+	else
+		python ../courtfind.py
+	fi
 else
 	echo "using existing court info"
 fi
 # out court.txt
+#######################################################
+# dewarp wide angle lens (assumes Hero9)
+#######################################################
+if [ $dewarpVideo -eq 1 ];
+then
+	python ../lensfunCorrect.py -v $vidname
+	vidname=${vidname}_undistorted.mp4
+else
+	echo "using existing court info"
+fi
 #######################################################
 #### create mask and per frame confidences that court is in frame.
 # in: video. Also expects to find testframe.png and court.txt in cwd
