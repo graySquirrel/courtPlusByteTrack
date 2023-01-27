@@ -8,6 +8,9 @@ import cv2
 import torch
 import csv
 import numpy as np
+import math
+import sys
+import glob
 
 from loguru import logger
 
@@ -292,18 +295,62 @@ def draw_birdseye(img, points):
     imgout = cv2.line(imgout, points[12], points[13], [0, 0, 255], 3)
     return imgout
 ########################################################################
-def getClosestFour(xtarg, pts):
-    # if we get here there are > 4 points and we need to find closest 4
-    # to the X target.
-    diffs = []
-    for pt in pts:
-        diffs.append(abs(pt[0] - xtarg))
-    s = np.array(diffs)
+def distance_function(pt, xtl, ytl, xbr, ybr):
+    # inside check - if inside, distance is 0
+    x = pt[0]
+    y = pt[1]
+    if x > xtl and x < xbr and y > ytl and y < ybr:
+        return 0
+    #dr = min(abs(x - xtl), abs(x - xbr), abs(y - ytl), abs(y - ybr))
+    # if x is inside x range
+    if x > xtl and x < xbr:
+        dr = min(abs(y - ytl), abs(y - ybr))
+        return dr
+    # if y is inside y range
+    if y > ytl and y < ybr:
+        dr = min(abs(x - xtl), abs(x - xbr))
+        return dr
+    # else do euclidean to nearest corner
+    tlDist = math.sqrt((pt[0]-xtl)**2 + (pt[1]-ytl)**2)
+    trDist = math.sqrt((pt[0]-xbr)**2 + (pt[1]-ytl)**2)
+    blDist = math.sqrt((pt[0]-xtl)**2 + (pt[1]-ybr)**2)
+    brDist = math.sqrt((pt[0]-xbr)**2 + (pt[1]-ybr)**2)
+    return min(tlDist, trDist, blDist, brDist)
+
+def calc_sorted_distance_from_point(pts):
+    x = 3.05 #center point of court
+    y = 6.71
+    xtl = 0
+    ytl = 0
+    xbr = 6.1
+    ybr = 13.41
+    dists = []
+    for pt in pts:        
+        #dist = math.sqrt((pt[0]-x)**2 + (pt[1]-y)**2)
+        dist = distance_function(pt, xtl, ytl, xbr, ybr)
+        dists.append(dist)
+    s = np.array(dists)
     sort_index = np.argsort(s)
+    return sort_index
+
+def getClosestFour(pts):
+    # if we get here there are > 4 points and we need to find closest 4
+    # to the X,Y target, which is the center of the court (3.05, 6.71)
+    sorted_indexes = calc_sorted_distance_from_point(pts)
     out = []
     for i in range(0,4):
-        out.append(pts[sort_index[i]])
+        out.append(pts[sorted_indexes[i]])
     return np.array(out)
+
+    # diffs = []
+    # for pt in pts:
+    #     diffs.append(abs(pt[0] - xtarg))
+    # s = np.array(diffs)
+    # sort_index = np.argsort(s)
+    # out = []
+    # for i in range(0,4):
+    #     out.append(pts[sort_index[i]])
+    # return np.array(out)
         
 ########################################################################
 def drawPeepPoints(img,tlwhs, mat, points):
@@ -332,11 +379,11 @@ def drawPeepPoints(img,tlwhs, mat, points):
             #print("filtering ortho points")
             absD = []
             centerlineX = points[9][0] # point 9 is intersection lower baseline and centre serviceline
-            newpt = getClosestFour(centerlineX, outpt)
+            newpt = getClosestFour(outpt)
             #print(outpt)
             #print(newpt)
             outpt = newpt
-
+        #print("out3",outpt)
         outptsc = outpt * orthscale
         outptsc = outptsc + orthshift
         outptsc = np.int32(outptsc)
@@ -438,6 +485,7 @@ def imageflow_demo(predictor, vis_folder, current_time, args):
                     frame, online_tlwhs, online_ids, frame_id=frame_id + 1, fps=1. / timer.average_time
                 )
                 # draw point onto ortho court
+                #print("frame",frame_id)
                 online_im, thisPeep = drawPeepPoints(online_im,online_tlwhs,xform, orthpoints)
             else:
                 timer.toc()
