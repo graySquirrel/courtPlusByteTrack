@@ -3,19 +3,33 @@ import cv2
 import csv
 import sys
 import os
+from lensfunCorrect import getUndistortedCoordinates
+import argparse
 
-# print(cv2.__version__)
-# TODO argparse
-#videofile = "../vids/ProSenior_00_05_27-40.mp4"
-#videofile = "/home/vboxuser/share/ProSenior_00:05:27_20.mp4"
-if len(sys.argv) < 2:
-    sys.exit('Usage: python validate.py <input video>')
+# Construct the argument parser and parse the arguments
+arg_desc = '''\
+           Usage: python validate.py -v <video> [-d] 
+        '''
+parser = argparse.ArgumentParser(formatter_class = argparse.RawDescriptionHelpFormatter,
+                                    description= arg_desc)
+ 
+parser.add_argument("-d", "--dewarp", action='store_true')
+parser.add_argument("-v", "--video", metavar="VIDEO", help = "Path to your input video")
+args = vars(parser.parse_args())
 
-if not os.path.exists(sys.argv[1]):
-    sys.exit('ERROR: input video %s was not found!' % sys.argv[1])
+#print(args)
+dewarp = False
+if args["dewarp"]:
+    dewarp =  True
+    print("dewarp",dewarp)
+if args["video"]:
+    vidname = args["video"]
+    print("video",vidname)
 
-videofile = sys.argv[1]
-framefile = "testframe.png"
+if not os.path.exists(vidname):
+    sys.exit('ERROR: input video %s was not found!' % vidname)
+
+framefile = "testframe.png" # assume its dewarped here if needed.
 datfile = "court.txt"
 ##
 # validate.py will do the following:
@@ -135,7 +149,7 @@ def getoutbounds(orthpts, imgpts):
     src[:, 0] = testpts
     outpts = cv2.perspectiveTransform(src, resmatrix)
     outpts = outpts[:, 0, :]
-    print('bounds', outpts)
+    #print('bounds', outpts)
     return(outpts)
 #########################################################################
 # make an image mask of the points made from getoutbounds()
@@ -145,14 +159,14 @@ def getMask(framefile, shape):
     img = cv2.imread(framefile)
     themask = np.ones([img.shape[0], img.shape[1]], dtype='uint8')
     points = np.array(shape, dtype='int')
-    print(points)
+    #print(points)
     toppoint = [[points[0][0], 0]]
-    print(toppoint)
+    #print(toppoint)
     bottompoint = [[points[3][0], 0]]
-    print(bottompoint)
+    #print(bottompoint)
     points = np.append(toppoint, points, axis=0)
     points = np.append(points, bottompoint, axis=0)
-    print(points)
+    #print(points)
     cv2.fillPoly(themask, pts=[points], color=([255]))
     return themask
 
@@ -175,13 +189,19 @@ with open("target.csv", 'w') as csvfile:
     csvwriter.writerow(targmaxes)
 # get the per-frame metadata
 framemetadata = []
-cap = cv2.VideoCapture(videofile)
+cap = cv2.VideoCapture(vidname)
 framenum = 0
+didIinit = False
 while True:
     conf = 0
     ret, frame = cap.read()
     if ret == False:
         break
+    if dewarp:
+        if didIinit == False:
+            undistorted = getUndistortedCoordinates(width, height)
+            didIinit = True
+        frame = cv2.remap(frame, undistorted, None, cv2.INTER_LANCZOS4)
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
     conf = getConf(gray, targmaxes, intpts)
     # print('conf',conf)
@@ -193,8 +213,8 @@ while True:
     # change waitkey to 0 if you want to wait for input to advance.
     # if cv2.waitKey(1) & 0xFF == ord('q'):
     #    break
-    if framenum % 500 == 0:
-        print(framenum)
+    if framenum % 1000 == 0:
+        print(framenum, end=' ')
 cap.release()
 cv2.destroyAllWindows()
 # write metadata file
