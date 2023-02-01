@@ -1,7 +1,8 @@
 import cv2
 import argparse
 import csv
- 
+from datetime import datetime
+
 # Construct the argument parser and parse the arguments
 arg_desc = '''\
            use -v to specify video name 
@@ -10,6 +11,7 @@ parser = argparse.ArgumentParser(formatter_class = argparse.RawDescriptionHelpFo
                                     description= arg_desc)
  
 parser.add_argument("-v", "--video", metavar="VIDEO", help = "Path to your input video")
+parser.add_argument("-s", "--start", metavar="START", help = "frame to start on")
 parser.add_argument("-d", "--detections", metavar="DETECTIONS", help = "detections file from ByteTrack")
 args = vars(parser.parse_args())
  
@@ -24,6 +26,9 @@ if args["detections"]:
 else:
     print("missing arg -d for detections")
     quit()
+startframe = 0
+if args["start"]:
+    startframe = int(args["start"])
 
 cap = cv2.VideoCapture(vidname)
 fps = cap.get(cv2.CAP_PROP_FPS)
@@ -95,7 +100,8 @@ cv2.namedWindow('Frame')
 cv2.setMouseCallback('Frame', click_capture)
 
 currentClickPt = []
-myIds = frames[0]
+myIds = frames[startframe]
+cap.set(cv2.CAP_PROP_POS_FRAMES, startframe)
 IDselected = 0
 hitSelected = ""
 fOrB = ""
@@ -142,6 +148,10 @@ while (cap.isOpened()):
 			if framenum < length-10:
 				cap.set(1, framenum + 10)
 			continue
+		elif key == ord('0'):
+			hitSelected = "NotA"
+			fOrB = "hit"
+			print("0 (None) selected.  Press S to save annotation")
 		elif key == ord('1'):
 			hitSelected = "Serve"
 			print("1 (Serve) selected.  Now select F for forehand or B for backhand")
@@ -191,7 +201,10 @@ while (cap.isOpened()):
 		break
 
 # save the annotation file
-output_csv_path = vidname + "_annotation.csv"
+t = datetime.now()
+formatted_time = t.strftime('%d-%m-%y_%H-%M-%S')
+#print(formatted_time)
+output_csv_path = vidname + "_annotation" + formatted_time + ".csv"
 with open(output_csv_path, 'w') as csvfile: 
 	# creating a csv writer object 
 	csvwriter = csv.writer(csvfile) 
