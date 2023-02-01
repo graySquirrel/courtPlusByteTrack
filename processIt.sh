@@ -79,14 +79,17 @@ echo "current env is" $CONDA_DEFAULT_ENV
 ######### do manual court finding in bytetrack env ####
 if [ $ignoreCourt -ne 1 ];
 then
-	python ../extractFrame.py -v $vidname -f 1
+	echo "extracting frame and running courtfind"
 	# out testframe.png
 	if [ $dewarpVideo -eq 1 ];
 	then
-		python ../courtfind.py -d
+	echo "extracting frame, dewarping and running courtfind"
+		python ../extractFrame.py -v $vidname -f 1 -d
 	else
-		python ../courtfind.py
+	echo "extracting frame and running courtfind"
+		python ../extractFrame.py -v $vidname -f 1
 	fi
+	python ../courtfind.py
 else
 	echo "using existing court info"
 fi
@@ -96,15 +99,17 @@ fi
 #######################################################
 if [ $dewarpVideo -eq 1 ];
 then
+	echo "dewarping video"
 	python ../lensfunCorrect.py -v $vidname
 	vidname=${vidname}_undistorted.mp4
 else
 	echo "using existing court info"
 fi
+echo "video name is " $vidname
 #######################################################
 #### create mask and per frame confidences that court is in frame.
 # in: video. Also expects to find testframe.png and court.txt in cwd
-python ../validate.py $vidname
+python ../validate.py -v $vidname
 # out: mask.png, target.csv, courtConf.csv
 #######################################################
 #### object detection and tracking for players, annotate video.
