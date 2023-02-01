@@ -31,7 +31,7 @@ def make_parser():
         "demo", default="image", help="demo type, eg. image, video and webcam"
     )
     parser.add_argument("-expn", "--experiment-name", type=str, default=None)
-    parser.add_argument("-cc", "--court-confidence", type=str, default=None)
+    #parser.add_argument("-cc", "--court-confidence", type=str, default=None)
     parser.add_argument("-map", "--court-mapping", type=str, default=None)
     parser.add_argument("-mask", "--court-mask", type=str, default=None)
     parser.add_argument("-n", "--name", type=str, default=None, help="model name")
@@ -406,11 +406,11 @@ def imageflow_demo(predictor, vis_folder, current_time, args):
     imgpoints, intimgpoints, orthpoints = getpoints(datfile)
     xform = cv2.getPerspectiveTransform(imgpoints[:4], orthpoints[:4])
     # read court confidence file
-    conffile = args.court_confidence
-    csv_file = open(conffile)
-    reader = csv.reader(csv_file)
-    line = next(reader) #skip header
-    print(line)
+    #conffile = args.court_confidence
+    #csv_file = open(conffile)
+    #reader = csv.reader(csv_file)
+    #line = next(reader) #skip header
+    #print(line)
     maskfile = args.court_mask
     msk = cv2.imread(maskfile) # read in as 3 channel image
     #cv2.imshow('mask',msk)
@@ -434,7 +434,7 @@ def imageflow_demo(predictor, vis_folder, current_time, args):
     )
     print("fps ",fps)
     fpsint = round(fps,0)
-    print("fpsint ",fpsint)
+    #print("fpsint ",fpsint)
     #tracker = BYTETracker(args, frame_rate=30)
     tracker = BYTETracker(args, frame_rate=fpsint)
     timer = Timer()
@@ -448,8 +448,8 @@ def imageflow_demo(predictor, vis_folder, current_time, args):
         ret_val, frame = cap.read()
         if ret_val:
             # get next confidence value
-            line = next(reader)
-            conf = float(line[1])
+            #line = next(reader)
+            #conf = float(line[1])
             #print(line, conf)
             # mask frame
             frame1 = cv2.bitwise_and(frame, msk) # using mask didn't work, but this did.
@@ -518,7 +518,7 @@ def imageflow_demo(predictor, vis_folder, current_time, args):
         with open(res_file2, 'w') as f:
             f.writelines(peepPoints)
         logger.info(f"save results to {res_file}")
-    csv_file.close() # close the court confidence csv file
+    #csv_file.close() # close the court confidence csv file
 
 
 def main(exp, args):
