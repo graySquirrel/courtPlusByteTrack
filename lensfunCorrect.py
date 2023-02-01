@@ -54,7 +54,7 @@ def getUndistortedCoordinates(width, height):
     #print(lens)
     #Lens(Maker: GoPro; Model: HERO4; Type: FISHEYE_EQUISOLID; Focal: 3.0-3.0; Aperture: None-None; Crop factor: 7.659999847412109; Score: 15)
 
-    focal_length = 7.0
+    focal_length = 5 # this is the key parameter.  change it if the warping is different with a different setting.
     aperture = 0
     distance = 50
     mod = lensfunpy.Modifier(lens, cam.crop_factor, width, height)
@@ -112,7 +112,7 @@ def main():
             break
         framecount += 1
         if framecount % 500 == 0:
-            print(framecount)
+            print(framecount, end=' ')
     # When everything done, release the video capture object
     cap.release()
 
