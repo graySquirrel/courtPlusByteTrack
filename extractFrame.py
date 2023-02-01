@@ -1,6 +1,7 @@
 import cv2
 import argparse
- 
+from lensfunCorrect import getUndistortedCoordinates
+
 # Construct the argument parser and parse the arguments
 arg_desc = '''\
            use -v to specify video name use -f to specify frame number
@@ -10,9 +11,13 @@ parser = argparse.ArgumentParser(formatter_class = argparse.RawDescriptionHelpFo
  
 parser.add_argument("-v", "--video", metavar="VIDEO", help = "Path to your input video")
 parser.add_argument("-f", "--frame_num", metavar="FRAMENUM", help = "The frame you want to extract")
+parser.add_argument("-d", "--dewarp", action='store_true')
+dewarp = False
 args = vars(parser.parse_args())
- 
- 
+
+if args["dewarp"]:
+    dewarp =  True
+    print("dewarp",dewarp)
 if args["video"]:
     vidname = args["video"]
 else:
@@ -36,6 +41,10 @@ if (cap.isOpened()== False):
 	print("Error opening video stream or file")
 
 ret, frame = cap.read()
+height, width = frame.shape[0], frame.shape[1]
+if dewarp:
+    un = getUndistortedCoordinates(width, height)
+    frame = cv2.remap(frame, un, None, cv2.INTER_LANCZOS4)
 if ret == True:
 	cv2.imwrite(outframe, frame)
 
