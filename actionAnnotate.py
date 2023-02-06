@@ -40,32 +40,40 @@ print( length, "frames" )
 with open(detectFile) as csvfile:
 	readCSV = csv.reader(csvfile, delimiter=',')
 	list1 = []
-	frames = []
-	thisFrame = 0
-	tmpDetections = []
+	#frames = []
+	frames = [ [] for _ in range(length) ]
+	#thisFrame = 0
+	#tmpDetections = []
 	for row in readCSV: # parse the csv to list elements
 		list1.append(row)
 	for i in range(0 , len(list1)):
-		if int(list1[i][0]) != thisFrame: # 0th is frame num
-			# close last frame
-			frames.append(tmpDetections.copy())
-			#print("frame",thisFrame,"len",len(frames[thisFrame]))
-			#print(frames[thisFrame])
-			if len(frames[thisFrame]) == 0:
-				print("Frame",thisFrame,"has",len(frames[thisFrame]))
-			# reset this frame
-			tmpDetections = []
-			# set new frame
-			thisFrame = int(list1[i][0])
+		# if int(list1[i][0]) != thisFrame: # 0th is frame num
+		# 	# close last frame
+		# 	frames.append(tmpDetections.copy()) #527
+		# 	print(thisFrame) # 528
+		# 	print("frame",thisFrame,"len",len(frames[thisFrame])) 
+		# 	#print(frames[thisFrame])
+		# 	if len(frames[thisFrame]) == 0:
+		# 		print("Frame",thisFrame,"has",len(frames[thisFrame]))
+		# 	# reset this frame
+		# 	tmpDetections = []
+		# 	# set new frame
+		# 	thisFrame = int(list1[i][0])
 		# add this detection to current Frame
-		tmpDetections.append([  int(float(list1[i][1])), # ID
-								int(float(list1[i][2])), # X
-								int(float(list1[i][3])), # Y
-								int(float(list1[i][4])), # W
-								int(float(list1[i][5])) ]) # H
-	if tmpDetections != []:
-		frames.append(tmpDetections.copy())
-
+		thisFrame = int(list1[i][0])
+		frames[thisFrame].append([int(float(list1[i][1])),  # ID
+							  int(float(list1[i][2])),  # X
+							  int(float(list1[i][3])),  # Y
+							  int(float(list1[i][4])),  # W
+							  int(float(list1[i][5]))])  # H
+		# tmpDetections.append([  int(float(list1[i][1])), # ID
+		# 						int(float(list1[i][2])), # X
+		# 						int(float(list1[i][3])), # Y
+		# 						int(float(list1[i][4])), # W
+		# 						int(float(list1[i][5])) ]) # H
+	# if tmpDetections != []:
+	# 	frames.append(tmpDetections.copy())
+#print(frames)
 #for i in range(0,len(frames)):
 	#tmpd = frames[i]
 	#print(len(tmpd)," detections in frame ",i)
@@ -179,6 +187,13 @@ while (cap.isOpened()):
 		elif key == ord('b'):
 			fOrB = "Backhand"
 			print("B (ackhand) selected.  Press S to save annotation")
+		elif key == ord('u'):
+			# UNDO
+			if len(framesNiDsNlabels) > 0:
+				lastone = framesNiDsNlabels.pop()
+				print("UNDO removed", lastone)
+			else:
+				print("no moves to undo")
 		elif key == ord('s'):
 			if IDselected == 0:
 				print("please select a bounding box to annotate")
